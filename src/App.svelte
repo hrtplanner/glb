@@ -37,29 +37,27 @@
             male: {
                 ...layerCake.male,
                 usesPronoun: value.find((x) => x[0] === 0)![2],
-                preference: value.findIndex((x) => x[0] === 0)
+                preference: value.findIndex((x) => x[0] === 0),
             },
             female: {
                 ...layerCake.female,
                 usesPronoun: value.find((x) => x[0] === 1)![2],
-                preference: value.findIndex((x) => x[0] === 1)
+                preference: value.findIndex((x) => x[0] === 1),
             },
             nonBinary: {
                 ...layerCake.nonBinary,
                 usesPronoun: value.find((x) => x[0] === 2)![2],
-                preference: value.findIndex((x) => x[0] === 2)
+                preference: value.findIndex((x) => x[0] === 2),
             },
             agender: {
                 ...layerCake.agender,
                 usesPronoun: value.find((x) => x[0] === 3)![2],
-                preference: value.findIndex((x) => x[0] === 3)
+                preference: value.findIndex((x) => x[0] === 3),
             },
         };
     });
 
-    const languageOther = [
-        "I use any (or a subset) of other pronouns."
-    ];
+    const languageOther = ["I use any (or a subset) of other pronouns."];
 
     const otherPronouns: Writable<[number, string, boolean][]> = writable([
         [0, languageOther[0], false],
@@ -72,41 +70,41 @@
         };
     });
 
-	const languageBigender = [
-		"On different occasions, I feel more-or-less masculine.",
-		"On different occasions, I feel more-or-less feminine.",
-		"On different occasions, I feel more-or-less a gender outside of the male/female binary.",
-		"On different occasions, I feel more-or-less a gender unrelated to the male/female binary."
-	];
+    const languageBigender = [
+        "On different occasions, I feel more-or-less masculine.",
+        "On different occasions, I feel more-or-less feminine.",
+        "On different occasions, I feel more-or-less a gender outside of the male/female binary.",
+        "On different occasions, I feel more-or-less a gender unrelated to the male/female binary.",
+    ];
 
-	const bigender: Writable<[number, string, boolean][]> = writable([
-		[0, languageBigender[0], false],
-		[1, languageBigender[1], false],
-		[2, languageBigender[2], false],
-		[3, languageBigender[3], false],
-	]);
+    const bigender: Writable<[number, string, boolean][]> = writable([
+        [0, languageBigender[0], false],
+        [1, languageBigender[1], false],
+        [2, languageBigender[2], false],
+        [3, languageBigender[3], false],
+    ]);
 
-	bigender.subscribe((value) => {
-		layerCake = {
-			...layerCake,
-			male: {
-				...layerCake.male,
-				bigenderOption: value.find((x) => x[0] === 0)![2],
-			},
-			female: {
-				...layerCake.female,
-				bigenderOption: value.find((x) => x[0] === 1)![2],
-			},
-			nonBinary: {
-				...layerCake.nonBinary,
-				bigenderOption: value.find((x) => x[0] === 2)![2],
-			},
-			agender: {
-				...layerCake.agender,
-				bigenderOption: value.find((x) => x[0] === 3)![2],
-			},
-		};
-	});	
+    bigender.subscribe((value) => {
+        layerCake = {
+            ...layerCake,
+            male: {
+                ...layerCake.male,
+                bigenderOption: value.find((x) => x[0] === 0)![2],
+            },
+            female: {
+                ...layerCake.female,
+                bigenderOption: value.find((x) => x[0] === 1)![2],
+            },
+            nonBinary: {
+                ...layerCake.nonBinary,
+                bigenderOption: value.find((x) => x[0] === 2)![2],
+            },
+            agender: {
+                ...layerCake.agender,
+                bigenderOption: value.find((x) => x[0] === 3)![2],
+            },
+        };
+    });
 
     let genPronouns: [string, string][] = $state([]);
 
@@ -114,7 +112,7 @@
         "I usually present in a way that is typically masculine.",
         "I usually present in a way that is typically feminine.",
         "I usually present in a way that is typically androgynous.",
-        "I usually present in a way that is typically gender-neutral."
+        "I usually present in a way that is typically gender-neutral.",
     ];
 
     const presentation: Writable<[number, string, boolean][]> = writable([
@@ -149,76 +147,121 @@
     let isMobile = window.innerWidth < 800;
 
     function encodeSettings() {
-        let str = "";
+        let packed = 0;
+        let bitPos = 0;
+
         for (const key in layerCake) {
             if (key === "usesOtherPronouns") continue;
             const layer = layerCake[key] as Layer;
-            str += layer.usesPronoun ? "1" : "0";
-            str += layer.presentation ? "1" : "0";
-            str += layer.preference.toString();
-            str += layer.bigenderOption ? "1" : "0";
+
+            if (layer.usesPronoun) packed |= 1 << bitPos;
+            bitPos++;
+
+            if (layer.presentation) packed |= 1 << bitPos;
+            bitPos++;
+
+            packed |= (layer.preference & 3) << bitPos;
+            bitPos += 2;
+
+            if (layer.bigenderOption) packed |= 1 << bitPos;
+            bitPos++;
         }
-        str += layerCake.usesOtherPronouns ? "1" : "0";
-        return str;
+
+        if (layerCake.usesOtherPronouns) packed |= 1 << bitPos;
+
+        return btoa(
+            String.fromCharCode(
+                packed & 0xff,
+                (packed >> 8) & 0xff,
+                (packed >> 16) & 0xff,
+            ),
+        );
     }
 
     function verifySettingsIntegrity(str: string) {
-        if (str.length !== 17) return false;
-        for (let i = 0; i < 16; i++) {
-            if (i % 4 === 0) {
-                if (str[i] !== "0" && str[i] !== "1") return false;
-            } else if (i % 4 === 1) {
-                if (str[i] !== "0" && str[i] !== "1") return false;
-            } else if (i % 4 === 2) {
-                if (str[i] !== "0" && str[i] !== "1" && str[i] !== "2" && str[i] !== "3") return false;
-            } else if (i % 4 === 3) {
-                if (str[i] !== "0" && str[i] !== "1") return false;
-            }
+        try {
+            const decoded = atob(str);
+            return decoded.length === 3;
+        } catch (e) {
+            return false;
         }
-        if (str[16] !== "0" && str[16] !== "1") return false;
-        return true;
     }
 
     function decodeSettings(str: string) {
-        let i = 0;
-        for (const key in layerCake) {
-            if (key === "usesOtherPronouns") continue;
-            const layer = layerCake[key] as Layer;
-            layer.usesPronoun = str[i] === "1";
-            layer.presentation = str[i + 1] === "1";
-            layer.preference = parseInt(str[i + 2]);
-            layer.bigenderOption = str[i + 3] === "1";
-            layerCake[key] = layer;
-            i += 4;
-        }
-        layerCake.usesOtherPronouns = str[i] === "1";
+        try {
+            const decoded = atob(str);
 
+            let packed =
+                decoded.charCodeAt(0) |
+                (decoded.charCodeAt(1) << 8) |
+                (decoded.charCodeAt(2) << 16);
+
+            let bitPos = 0;
+
+            for (const key in layerCake) {
+                if (key === "usesOtherPronouns") continue;
+                const layer = layerCake[key] as Layer;
+
+                layer.usesPronoun = !!(packed & (1 << bitPos));
+                bitPos++;
+
+                layer.presentation = !!(packed & (1 << bitPos));
+                bitPos++;
+
+                layer.preference = (packed >> bitPos) & 3;
+                bitPos += 2;
+
+                layer.bigenderOption = !!(packed & (1 << bitPos));
+                bitPos++;
+
+                layerCake[key] = layer;
+            }
+            layerCake.usesOtherPronouns = !!(packed & (1 << bitPos));
+            updateStores();
+        } catch (e) {
+            window.location.hash = "";
+            decodeSettings(btoa("\0\0\0"));
+        }
+    }
+
+    function updateStores() {
         pronouns.update((value) => {
             let val = value.map((x) => {
-                x[2] = (Object.values(layerCake)[x[0] as number] as Layer).usesPronoun;
+                x[2] = (
+                    Object.values(layerCake)[x[0] as number] as Layer
+                ).usesPronoun;
                 return x;
             });
             val.sort((a, b) => {
-                return (Object.values(layerCake)[a[0] as number] as Layer).preference - (Object.values(layerCake)[b[0] as number] as Layer).preference;
+                return (
+                    (Object.values(layerCake)[a[0] as number] as Layer)
+                        .preference -
+                    (Object.values(layerCake)[b[0] as number] as Layer)
+                        .preference
+                );
             });
             return val;
         });
 
-		presentation.update((value) => {
-			let val = value.map((x) => {
-				x[2] = (Object.values(layerCake)[x[0] as number] as Layer).presentation || false;
-				return x;
-			});
-			return val;
-		});
+        presentation.update((value) => {
+            let val = value.map((x) => {
+                x[2] =
+                    (Object.values(layerCake)[x[0] as number] as Layer)
+                        .presentation || false;
+                return x;
+            });
+            return val;
+        });
 
-		bigender.update((value) => {
-			let val = value.map((x) => {
-				x[2] = (Object.values(layerCake)[x[0] as number] as Layer).bigenderOption || false;
-				return x;
-			});
-			return val;
-		});
+        bigender.update((value) => {
+            let val = value.map((x) => {
+                x[2] =
+                    (Object.values(layerCake)[x[0] as number] as Layer)
+                        .bigenderOption || false;
+                return x;
+            });
+            return val;
+        });
 
         otherPronouns.update((value) => {
             value[0][2] = layerCake.usesOtherPronouns || false;
@@ -230,8 +273,7 @@
         const hash = window.location.hash;
         const settings = hash.slice(1);
         if (settings) {
-            if (verifySettingsIntegrity(settings))
-                decodeSettings(settings);
+            if (verifySettingsIntegrity(settings)) decodeSettings(settings);
             else {
                 window.location.hash = "";
                 decodeSettings("00000000000000000");
@@ -245,12 +287,217 @@
 </script>
 
 {#if isMobile}
-    <h1>Sorry, this app is not available on mobile devices.</h1>
-    <style>
-        h1 {
-            font-family: 'DM Serif Text', serif;
-            text-align: center;
-            margin-top: 20vh;
+    <main class="mobile">
+        <div class="canvas_wrapper mobile">
+            <Canvas>
+                <Scene
+                    layerCake={layerCake || {
+                        male: Unused,
+                        female: Unused,
+                        nonBinary: Unused,
+                        agender: Unused,
+                        usesOtherPronouns: false,
+                    }}
+                    bind:pronouns={genPronouns}
+                    isMobile
+                />
+            </Canvas>
+        </div>
+
+        <div class="mobile_questionnaire">
+            <div class="overflow">
+                <h1>Gender Lego Bricks</h1>
+
+                <h3>~ <i>Stereotypical pronouns</i></h3>
+                <div class="pronouns_display mobile">
+                    {#each genPronouns as [pronoun, color], i}
+                        <span style="color: {color}">{pronoun}</span>
+                        {#if i !== genPronouns.length - 1}
+                            <span class="separator">/</span>
+                        {/if}
+                    {/each}
+                </div>
+
+                <div class="question_section mobile">
+                    <h3>
+                        Which of the following do you identify with
+                        most-to-least?
+                    </h3>
+                    <TogglableDrag options={pronouns} isMobile />
+                </div>
+
+                <div class="question_section mobile">
+                    <h3>Do you identify with any of the following?</h3>
+                    <Togglable options={bigender} isMobile />
+                </div>
+
+                <div class="question_section mobile">
+                    <h3>Do you use any other pronouns?</h3>
+                    <Togglable options={otherPronouns} isMobile />
+                </div>
+
+                <div class="question_section mobile">
+                    <h3>How do you present (appear)?</h3>
+                    <Togglable options={presentation} oneOnly isMobile />
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <main class="mobile">
+        <div class="canvas_wrapper mobile">
+            <Canvas>
+                <Scene
+                    layerCake={layerCake || {
+                        male: Unused,
+                        female: Unused,
+                        nonBinary: Unused,
+                        agender: Unused,
+                        usesOtherPronouns: false,
+                    }}
+                    bind:pronouns={genPronouns}
+                    isMobile
+                />
+            </Canvas>
+        </div>
+
+        <div class="mobile_questionnaire">
+            <div class="overflow">
+                <h1>Gender Lego Bricks</h1>
+
+                <h3>~ <i>Stereotypical pronouns</i></h3>
+                <div class="pronouns_display mobile">
+                    {#each genPronouns as [pronoun, color], i}
+                        <span style="color: {color}">{pronoun}</span>
+                        {#if i !== genPronouns.length - 1}
+                            <span class="separator">/</span>
+                        {/if}
+                    {/each}
+                </div>
+
+                <div class="question_section mobile">
+                    <h3>
+                        Which of the following do you identify with
+                        most-to-least?
+                    </h3>
+                    <TogglableDrag options={pronouns} isMobile />
+                </div>
+
+                <div class="question_section mobile">
+                    <h3>Do you identify with any of the following?</h3>
+                    <Togglable options={bigender} isMobile />
+                </div>
+
+                <div class="question_section mobile">
+                    <h3>Do you use any other pronouns?</h3>
+                    <Togglable options={otherPronouns} isMobile />
+                </div>
+
+                <div class="question_section mobile">
+                    <h3>How do you present (appear)?</h3>
+                    <Togglable options={presentation} oneOnly isMobile />
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <style scoped>
+        html,
+        body {
+            overflow-x: hidden;
+            overflow-y: scroll;
+        }
+
+        h1,
+        h3 {
+            font-family: "DM Serif Text", serif;
+        }
+
+        main {
+            min-height: 100vh;
+            width: 100vw;
+            display: flex;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .mobile {
+            width: 100vw;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-y: auto;
+        }
+
+        .pronouns_display {
+            font-family: "DM Serif Text", serif;
+            display: block;
+            margin-bottom: 50px;
+            padding: 3px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+            background-color: #c0c0c0;
+            padding-left: 10px;
+            box-sizing: border-box;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+            width: 100%;
+        }
+
+        .separator {
+            color: #000;
+            font-weight: bolder;
+            font-family: "Roboto Flex", sans-serif;
+        }
+
+        .canvas_wrapper {
+            pointer-events: none;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+        }
+
+        .canvas_wrapper canvas {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-40%);
+        }
+
+        .mobile_questionnaire {
+            width: 100vw;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: fixed;
+            top: 300px;
+            left: 0;
+            padding: 20px;
+            padding-bottom: 100px;
+            background-color: #f0f0f0;
+            box-sizing: border-box;
+            overflow-y: auto;
+            height: calc(100vh - 200px);
+        }
+
+        .overflow {
+            overflow-y: scroll;
+            width: 100%;
+            max-height: 100%;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .overflow::-webkit-scrollbar {
+            display: none;
+            visibility: hidden;
+        }
+
+        .question_section {
+            width: 100%;
         }
     </style>
 {:else}
@@ -266,6 +513,7 @@
                         usesOtherPronouns: false,
                     }}
                     bind:pronouns={genPronouns}
+                    isMobile={false}
                 />
             </Canvas>
         </div>
@@ -273,7 +521,7 @@
         <div class="questionnaire_wrapper">
             <h1>Gender Lego Bricks</h1>
             <div class="overflow">
-				<h3>~ <i>You may want to try these pronouns:</i></h3>
+                <h3>~ <i>Stereotypical pronouns</i></h3>
                 <div class="pronouns_display">
                     {#each genPronouns as [pronoun, color], i}
                         <span style="color: {color}">{pronoun}</span>
@@ -281,22 +529,25 @@
                             <span class="separator">/</span>
                         {/if}
                     {/each}
-				</div>
+                </div>
 
                 <div class="question_section">
-                    <h3>Which of the following do you identify with most-to-least?</h3>
+                    <h3>
+                        Which of the following do you identify with
+                        most-to-least?
+                    </h3>
                     <div class="scrollable">
                         <TogglableDrag options={pronouns} />
                     </div>
                 </div>
 
-				<div class="question_section">
-					<h3>Do you identify with any of the following?</h3>
+                <div class="question_section">
+                    <h3>Do you identify with any of the following?</h3>
 
-					<div class="scrollable">
-						<Togglable options={bigender} />
-					</div>
-				</div>
+                    <div class="scrollable">
+                        <Togglable options={bigender} />
+                    </div>
+                </div>
 
                 <div class="question_section">
                     <h3>Do you use any other pronouns?</h3>
@@ -331,7 +582,7 @@
         .canvas_wrapper {
             width: 800px;
             height: 500px;
-            transform: translateX(-10%) translateY(-50%);
+            transform: translateY(-50%);
             position: fixed;
             top: 50%;
             right: 0;

@@ -3,9 +3,14 @@
 
     export type Options = [number, string, boolean][];
 
-    let { options, oneOnly = false }: {
+    let {
+        options,
+        oneOnly = false,
+        isMobile = false,
+    }: {
         options: Writable<Options>;
         oneOnly?: boolean;
+        isMobile?: boolean;
     } = $props();
 
     let optionsCopy: Options = $state([]);
@@ -20,22 +25,26 @@
         <div
             tabindex={i}
             role="cell"
-            class="option"
+            class="option {isMobile ? 'mobile' : ''}"
             style="user-select: none;"
             data-index={i}
         >
             <span>{x[1]}</span>
-            <input type="checkbox" bind:checked={() => x[2], (value) => {
-                if (oneOnly && value) {
+            <input
+                type="checkbox"
+                bind:checked={() => x[2],
+                (value) => {
+                    if (oneOnly && value) {
+                        const newOptions = optionsCopy.slice();
+                        newOptions[i] = [x[0], x[1], value];
+                        options.set(newOptions);
+                        return;
+                    }
                     const newOptions = optionsCopy.slice();
                     newOptions[i] = [x[0], x[1], value];
                     options.set(newOptions);
-                    return;
-                }
-                const newOptions = optionsCopy.slice();
-                newOptions[i] = [x[0], x[1], value];
-                options.set(newOptions);
-            }} />
+                }}
+            />
         </div>
     {/each}
 </div>
@@ -53,12 +62,28 @@
         cursor: pointer;
         transition: background-color 0.2s;
         border: rgba(0, 0, 0, 0.1) solid 1px;
-        font-family: 'Roboto Flex', sans-serif;
+        font-family: "Roboto Flex", sans-serif;
+    }
+
+    .option.mobile {
+        flex-direction: column;
+        align-items: flex-start;
+        margin: 10px;
+        box-sizing: border-box;
+        width: calc(90vw - 20px);
+    }
+
+    .option:focus {
+        outline: 2px solid #000;
     }
 
     .option span {
         flex: 1;
         font-size: 0.9em;
+    }
+
+    .option.mobile span {
+        margin-bottom: 0.5rem;
     }
 
     input[type="checkbox"] {
@@ -73,5 +98,9 @@
 
     input[type="checkbox"]:checked {
         background-color: #000;
+    }
+
+    input[type="checkbox"]:focus {
+        outline: none;
     }
 </style>
