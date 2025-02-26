@@ -1,0 +1,110 @@
+<script lang="ts">
+    import type { Writable } from "svelte/store";
+
+    export type Options = [number, string, boolean][];
+
+    let { options }: {
+        options: Writable<Options>;
+    } = $props();
+
+    let draggedIndex: number | null = null;
+
+    let optionsCopy: Options = $state([]);
+
+    options.subscribe((value) => {
+        optionsCopy = value;
+    });
+
+    function handleDragStart(e: DragEvent, index: number) {
+        draggedIndex = index;
+        e.dataTransfer!.effectAllowed = 'move';
+    }
+
+    function handleDragOver(e: DragEvent, index: number) {
+        e.preventDefault();
+        if (draggedIndex === null || draggedIndex === index) return;
+
+        const target = e.target as HTMLDivElement;
+        const rect = target.getBoundingClientRect();
+        const next = index > draggedIndex;
+        const after = next && e.clientY > rect.top + rect.height / 2;
+        const before = !next && e.clientY < rect.top + rect.height / 2;
+
+        if (after || before) {
+            const newOptions = optionsCopy.slice();
+            const [movedItem] = newOptions.splice(draggedIndex, 1);
+            newOptions.splice(index + (after ? 1 : 0) - (next ? 1 : 0), 0, movedItem);
+            options.set(newOptions);
+            draggedIndex = index + (after ? 1 : 0) - (next ? 1 : 0);
+        }
+    }
+
+    function handleDragEnd() {
+        draggedIndex = null;
+    }
+</script>
+
+<div role="grid">
+    {#each optionsCopy as x, i (x[0])}
+        <div
+            tabindex={i}
+            role="cell"
+            class="option draggable"
+            draggable="true"
+            ondragstart={(e) => handleDragStart(e, i)}
+            ondragover={(e) => handleDragOver(e, i)}
+            ondragend={handleDragEnd}
+            style="user-select: none;"
+            data-index={i}
+        >
+            <div class="handle">☰</div>
+            <span>{x[1]}</span>
+            <input type="checkbox" bind:checked={() => x[2], (value) => {
+                const newOptions = optionsCopy.slice();
+                newOptions[i] = [x[0], x[1], value];
+                options.set(newOptions);
+            }} />
+        </div>
+    {/each}
+</div>
+
+<style>
+    .handle {
+        cursor: grab;
+        margin-right: 0.5rem;
+    }
+
+    .option {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        margin: 10px;
+        text-align: left;
+        border-radius: 5px;
+        padding: 10px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        border: rgba(0, 0, 0, 0.1) solid 1px;
+        font-family: 'Roboto Flex', sans-serif;
+    }
+
+    .option span {
+        flex: 1;
+        font-size: 0.9em;
+    }
+
+    input[type="checkbox"] {
+        appearance: none;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        transition: background-color 0.2s;
+        cursor: pointer;
+    }
+
+    input[type="checkbox"]:checked {
+        background-color: #000;
+    }
+</style>
