@@ -6,8 +6,7 @@
     import { writable, type Writable } from "svelte/store";
     import { onMount } from "svelte";
     import Togglable from "./components/Togglable.svelte";
-    import Modal from "svelte-simple-modal";
-    import Preview from "./tutorial/Preview.svelte";
+    import Modal from "./tutorial/Modal.svelte";
 
     type LC = LayerCake & { [key: string]: Layer | boolean };
 
@@ -119,8 +118,8 @@
     const languagePresentation = [
         "I may present in a way that is identifiably masculine.",
         "I may present in a way that is identifiably feminine.",
-        "I may appear androgynous, where I present as a mix of both masculine/feminine properties.",
-        "I may appear gender-neutral, where I present in a fashion that is unrelated to the gender binary or is unidentifiable.",
+        "I may appear androgynous; I may present as a mix of both masculine/feminine properties.",
+        "I may appear gender-neutral; I may present in a fashion that is unrelated to the gender binary or is unidentifiable.",
     ];
 
     const presentation: Writable<[number, string, boolean][]> = writable([
@@ -337,12 +336,15 @@
             <div class="overflow">
                 <h1>Gender Lego Bricks</h1>
 
-                <Modal><Preview /></Modal>
+                <Modal />
 
                 <h3>~ <i>Stereotypical pronouns</i></h3>
                 <div class="pronouns_display mobile">
                     {#each genPronouns as [pronoun, color], i}
-                        <span style="color: {color}; -webkit-text-stroke: 0.5px black;">{pronoun}</span>
+                        <span
+                            style="color: {color};"
+                            >{pronoun}</span
+                        >
                         {#if i !== genPronouns.length - 1}
                             <span class="separator">/</span>
                         {/if}
@@ -375,103 +377,10 @@
         </div>
     </main>
 
-    <style scoped>
-        html,
-        body {
-            overflow-x: hidden;
-            overflow-y: scroll;
-        }
-
-        h1,
-        h3 {
-            font-family: "DM Serif Text", serif;
-        }
-
-        main {
-            min-height: 100vh;
-            width: 100vw;
-            display: flex;
-            align-items: center;
-            flex-direction: column;
-        }
-
-        .mobile {
-            width: 100vw;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            overflow-y: auto;
-        }
-
-        .pronouns_display {
-            font-family: "DM Serif Text", serif;
-            display: block;
-            margin-bottom: 50px;
-            padding: 3px;
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            border-radius: 5px;
-            background-color: #c0c0c0;
-            padding-left: 10px;
-            box-sizing: border-box;
-            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
-            width: 100%;
-        }
-
-        .separator {
-            color: #000;
-            font-weight: bolder;
-            font-family: "Roboto Flex", sans-serif;
-        }
-
-        .canvas_wrapper {
-            pointer-events: none;
-            width: 100vw;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: fixed;
-            top: 0;
-            left: 0;
-        }
-
-        .canvas_wrapper canvas {
-            position: absolute;
-            left: 50%;
-            transform: translateX(-40%);
-        }
-
-        .mobile_questionnaire {
-            width: 100vw;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            position: fixed;
-            top: 300px;
-            left: 0;
-            padding: 20px;
-            padding-bottom: 100px;
-            background-color: #f0f0f0;
-            box-sizing: border-box;
-            overflow-y: auto;
-            height: calc(100vh - 200px);
-        }
-
-        .overflow {
-            overflow-y: scroll;
-            width: 100%;
-            max-height: 100%;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-        }
-
-        .overflow::-webkit-scrollbar {
-            display: none;
-            visibility: hidden;
-        }
-
-        .question_section {
-            width: 100%;
+    <style global>
+        .canvas_wrapper.mobile, .canvas_wrapper.mobile div {
+            max-width: 360px;
+            transform: translateY(15%) translateX(-7%);
         }
     </style>
 {:else}
@@ -496,14 +405,19 @@
         <div class="questionnaire_wrapper">
             <h1>
                 <div class="hrtplanner_square" title="hrtplanner"></div>
-                 Gender Lego Bricks
+                Gender Lego Bricks
             </h1>
-            <Modal><Preview /></Modal>
+
+            <Modal />
+
             <div class="overflow">
                 <h3>~ <i>Stereotypical pronouns</i></h3>
                 <div class="pronouns_display">
                     {#each genPronouns as [pronoun, color], i}
-                        <span style="color: {color}; -webkit-text-stroke: 0.5px black;">{pronoun}</span>
+                        <span
+                            style="color: {color};"
+                            >{pronoun}</span
+                        >
                         {#if i !== genPronouns.length - 1}
                             <span class="separator">/</span>
                         {/if}
@@ -546,95 +460,180 @@
             </div>
         </div>
     </main>
-
-    <style scoped>
-        h1,
-        h3 {
-            font-family: "DM Serif Text", serif;
-        }
-
-        main {
-            min-height: 100vh;
-            width: 100vw;
-            display: flex;
-            align-items: center;
-            flex-direction: row;
-        }
-
-        .hrtplanner_square {
-            display: inline-flex;
-            background: linear-gradient(to bottom, #9fe1fc, #f7cad3);
-            border-radius: 5px;
-            border: rgba(255, 255, 255, 0.1);
-            width: 30px;
-            height: 30px;
-            margin-right: 5px;
-            vertical-align: middle;
-            align-self: center;
-            transform: translateY(-10%);
-        }
-
-        .canvas_wrapper {
-            width: 800px;
-            height: 500px;
-            transform: translateY(-50%);
-            position: fixed;
-            top: 50%;
-            right: 0;
-        }
-
-        .questionnaire_wrapper {
-            width: 50vw;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            position: fixed;
-            top: 0;
-            left: 0;
-            padding: 20px;
-            background-color: #f0f0f0;
-            border-right: 2px solid #000;
-        }
-
-        .overflow {
-            overflow-y: scroll;
-            width: 100%;
-            height: calc(100% - 100px);
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-        }
-
-        .overflow::-webkit-scrollbar {
-            display: none;
-            visibility: hidden;
-        }
-
-        .pronouns_display {
-            font-family: "DM Serif Text", serif;
-            display: flex;
-            margin-bottom: 50px;
-            padding: 3px;
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            border-radius: 5px;
-            background-color: #c0c0c0;
-            padding-left: 10px;
-            box-sizing: border-box;
-            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
-        }
-
-        .separator {
-            color: #000;
-            font-weight: bolder;
-            font-family: "Roboto Flex", sans-serif;
-        }
-
-        .question_section {
-            width: 100%;
-        }
-
-        .scrollable {
-            overflow-x: hidden;
-            overflow-y: scroll;
-        }
-    </style>
 {/if}
+
+<style>
+    h1,
+    h3 {
+        font-family: var(--font-primary);
+        margin-bottom: var(--spacing-md);
+        color: var(--color-fg);
+    }
+
+    main {
+        min-height: 100vh;
+        width: 100vw;
+        display: flex;
+        align-items: center;
+    }
+
+    main.mobile {
+        flex-direction: column;
+    }
+
+    .canvas_wrapper {
+        position: fixed;
+        pointer-events: none;
+    }
+
+    .canvas_wrapper.mobile {
+        max-width: 360px;
+        max-height: 360px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        top: 0;
+        left: 0;
+    }
+
+    .canvas_wrapper:not(.mobile) {
+        width: 800px;
+        height: 500px;
+        transform: translateY(-50%);
+        top: 50%;
+        right: 0;
+    }
+
+    .canvas_wrapper.mobile {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-40%);
+    }
+
+    .questionnaire_wrapper,
+    .mobile_questionnaire {
+        background-color: var(--color-bg-main);
+        padding: var(--spacing-lg);
+        box-sizing: border-box;
+        position: fixed;
+        box-shadow: var(--shadow-md);
+        transition: var(--transition-standard);
+        overflow-x: hidden;
+    }
+
+    .questionnaire_wrapper {
+        width: 50vw;
+        height: 100vh;
+        top: 0;
+        left: 0;
+        display: flex;
+        flex-direction: column;
+        border-right: 1px solid var(--color-border);
+    }
+
+    .mobile_questionnaire {
+        width: 100vw;
+        top: 300px;
+        left: 0;
+        height: calc(100vh - 200px);
+        padding-bottom: calc(var(--spacing-lg) + var(--spacing-xl));
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        border-top-left-radius: var(--radius-md);
+        border-top-right-radius: var(--radius-md);
+    }
+
+    .overflow {
+        overflow-x: hidden;
+        overflow-y: auto;
+        width: 100%;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        border-radius: var(--radius-sm);
+    }
+
+    .questionnaire_wrapper .overflow {
+        height: calc(100% - 100px);
+    }
+
+    .mobile_questionnaire .overflow {
+        max-height: 100%;
+    }
+
+    .overflow::-webkit-scrollbar,
+    .scrollable::-webkit-scrollbar {
+        display: none;
+    }
+
+    .pronouns_display {
+        font-family: var(--font-primary);
+        margin-bottom: var(--spacing-xl);
+        padding: var(--spacing-sm) var(--spacing-md);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-sm);
+        background-color: var(--color-bg-secondary);
+        box-sizing: border-box;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.05);
+        transition: var(--transition-standard);
+    }
+
+    .pronouns_display:not(.mobile) {
+        display: flex;
+    }
+
+    .pronouns_display.mobile {
+        display: block;
+        width: 100%;
+    }
+
+    .pronouns_display span {
+        transition: var(--transition-standard);
+    }
+
+    .separator {
+        color: var(--color-fg);
+        font-weight: bold;
+        font-family: var(--font-secondary);
+        margin: 0 var(--spacing-xs);
+    }
+
+    .question_section {
+        width: 100%;
+        margin-bottom: var(--spacing-lg);
+        padding-bottom: var(--spacing-md);
+        border-bottom: 1px solid var(--color-border);
+    }
+
+    .scrollable {
+        overflow-x: hidden;
+        overflow-y: auto;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        border-radius: var(--radius-sm);
+        padding: var(--spacing-xs);
+    }
+
+    .hrtplanner_square {
+        display: inline-flex;
+        background: linear-gradient(
+            to bottom,
+            var(--color-accent),
+            var(--color-accent-secondary)
+        );
+        border-radius: var(--radius-sm);
+        width: 30px;
+        height: 30px;
+        margin-right: var(--spacing-sm);
+        vertical-align: middle;
+        align-self: center;
+        transform: translateY(-10%);
+        box-shadow: var(--shadow-sm);
+        transition: var(--transition-standard);
+    }
+
+    .hrtplanner_square:hover {
+        transform: translateY(-10%) scale(1.05);
+        box-shadow: var(--shadow-md);
+    }
+</style>

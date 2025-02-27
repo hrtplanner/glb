@@ -1,6 +1,7 @@
 <script lang="ts">
     import { T, useTask, useThrelte } from "@threlte/core";
     import { Unused, type Layer, type LayerCake } from "../types/layer.d";
+    import { transitions } from "@threlte/extras";
 
     function clamp(value: number, min: number, max: number) {
         return Math.min(Math.max(value, min), max);
@@ -26,7 +27,7 @@
         },
         bigenderOption: "#FF61FF",
         otherPronouns: "#FF69B4",
-        anyPronouns: "#87CEEB"
+        anyPronouns: "#87CEEB",
     };
 
     function isUsed(layer: Layer) {
@@ -40,7 +41,7 @@
             nonBinary: Unused,
             agender: Unused,
             usesOtherPronouns: false,
-            usesAnyPronouns: false
+            usesAnyPronouns: false,
         },
         pronouns = $bindable([]),
         isMobile = false,
@@ -172,8 +173,20 @@
 
     const { renderer } = useThrelte();
 
+    function hexToInt(hex: string) {
+        return parseInt(hex.slice(1), 16);
+    }
+
+    function cssVarToHex(varName: string) {
+        return hexToInt(
+            getComputedStyle(document.documentElement).getPropertyValue(
+                varName,
+            ),
+        );
+    }
+
     useTask(() => {
-        renderer.setClearColor(0xffffff);
+        renderer.setClearColor(cssVarToHex("--color-bg-secondary"));
         if (isMobile) {
             const width = window.innerWidth;
             renderer.setSize(width * (6 / 8), width * (12 / 8));
@@ -181,6 +194,8 @@
         }
         renderer.setSize(800, 500);
     });
+
+    transitions();
 </script>
 
 <T.PerspectiveCamera
@@ -194,91 +209,78 @@
 />
 
 <T.Mesh position.y={0.5}>
-    {#if layerCake}
-        <T.Mesh position={[0, 0, 0]}>
-            <T.Mesh
-                position={[1.5, 2.5, -2]}
+    <T.Mesh position={[0, 0, 0]}>
+        <T.Mesh position={[1.5, 2.5, -2]}>
+            <T.BoxGeometry args={[4, 2, 1]} />
+            <T.MeshBasicMaterial
+                color={colors.anyPronouns as string}
                 visible={layerCake.usesAnyPronouns!}
-                castShadow
-            >
-                <T.BoxGeometry args={[4, 2, 1]} />
-                <T.MeshBasicMaterial color={colors.anyPronouns as string} />
-            </T.Mesh>
-            <T.Mesh
-                position={[1.5, 0.5, -2]}
+            />
+        </T.Mesh>
+        <T.Mesh
+            position={[1.5, 0.5, -2]}
+        >
+            <T.BoxGeometry args={[4, 2, 1]} />
+            <T.MeshBasicMaterial
+                color={colors.otherPronouns as string}
                 visible={layerCake.usesOtherPronouns!}
-                castShadow
-            >
-                <T.BoxGeometry args={[4, 2, 1]} />
-                <T.MeshBasicMaterial color={colors.otherPronouns as string} />
-            </T.Mesh>
-            {#each Object.keys(layerCake).slice(0, -2) as layer, i}
-                <T.Mesh position={[i, 0, 0]}>
-                    <T.Mesh
-                        position={[0, 0, 0]}
-                        visible={isUsed(layerCake[layer] as Layer) ||
-                            (layer === "nonBinary" &&
+            />
+        </T.Mesh>
+        {#each Array.from({ length: 4 }, (_, i) => i) as i}
+            <T.Mesh position={[i, 0, 0]}>
+                <T.Mesh
+                    position={[0, 0, 0]}
+                >
+                    <T.BoxGeometry args={[1, 1, 3]} />
+                    <T.MeshBasicMaterial
+                        color={Object.values(colors.gender)[i]}
+                        visible={isUsed(layerCake[Object.keys(layerCake)[i]] as Layer) ||
+                            (Object.keys(layerCake)[i] === "nonBinary" &&
                                 ((layerCake["agender"] as Layer).usesPronoun ||
-                                    (layerCake["agender"] as Layer)
-                                        .presentation ||
+                                    (layerCake["agender"] as Layer).presentation ||
                                     (layerCake["agender"] as Layer)
                                         .bigenderOption))}
-                        castShadow
-                    >
-                        <T.BoxGeometry args={[1, 1, 3]} />
-                        <T.MeshBasicMaterial
-                            color={Object.values(colors.gender)[i]}
-                        />
-                    </T.Mesh>
-                    {#if (layerCake[layer] as Layer).usesPronoun}
-                        <T.Mesh
-                            position={[
-                                0,
-                                1,
-                                4 -
-                                    clamp(
-                                        (layerCake[layer] as Layer).preference +
-                                            3,
-                                        3,
-                                        5,
-                                    ),
-                            ]}
-                            castShadow
-                        >
-                            <T.BoxGeometry width={1} height={1} depth={1} />
-                            <T.MeshBasicMaterial
-                                color={Object.values(colors.pronounType)[
-                                    clamp(
-                                        (layerCake[layer] as Layer).preference,
-                                        0,
-                                        2,
-                                    )
-                                ]}
-                            />
-                        </T.Mesh>
-                    {/if}
-                    <T.Mesh
-                        position={[0, 2, 0]}
-                        visible={(layerCake[layer] as Layer).presentation}
-                        castShadow
-                    >
-                        <T.BoxGeometry args={[1, 1, 3]} />
-                        <T.MeshBasicMaterial
-                            color={Object.values(colors.presentation)[i]}
-                        />
-                    </T.Mesh>
-                    <T.Mesh
-                        position={[0, 3, 0]}
-                        visible={(layerCake[layer] as Layer).bigenderOption}
-                        castShadow
-                    >
-                        <T.BoxGeometry args={[1, 1, 3]} />
-                        <T.MeshBasicMaterial
-                            color={colors.bigenderOption as string}
-                        />
-                    </T.Mesh>
+                    />
                 </T.Mesh>
-            {/each}
-        </T.Mesh>
-    {/if}
+                <T.Mesh
+                    position={[
+                        0,
+                        1,
+                        4 -
+                            clamp(
+                                (layerCake[Object.keys(layerCake)[i]] as Layer).preference + 3,
+                                3,
+                                5,
+                            ),
+                    ]}
+                >
+                    <T.BoxGeometry width={1} height={1} depth={1} />
+                    <T.MeshBasicMaterial
+                        color={Object.values(colors.pronounType)[
+                            clamp((layerCake[Object.keys(layerCake)[i]] as Layer).preference, 0, 2)
+                        ]}
+                        visible={(layerCake[Object.keys(layerCake)[i]] as Layer).usesPronoun}
+                    />
+                </T.Mesh>
+                <T.Mesh
+                    position={[0, 2, 0]}
+                >
+                    <T.BoxGeometry args={[1, 1, 3]} />
+                    <T.MeshBasicMaterial
+                        color={Object.values(colors.presentation)[i]}
+                        visible={(layerCake[Object.keys(layerCake)[i]] as Layer).presentation}
+                    />
+                </T.Mesh>
+                <T.Mesh
+                    position={[0, 3, 0]}
+                >
+                    <T.BoxGeometry args={[1, 1, 3]} />
+                    <T.MeshBasicMaterial
+                        color={colors.bigenderOption as string}
+                        visible={(layerCake[Object.keys(layerCake)[i]] as Layer).bigenderOption}
+                    />
+                </T.Mesh>
+            </T.Mesh>
+        {/each}
+    </T.Mesh>
 </T.Mesh>

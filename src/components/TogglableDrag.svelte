@@ -118,7 +118,6 @@
     .itemgrid {
         display: flex;
         flex-direction: column;
-        justify-content: left;
         width: 100%;
     }
 
@@ -136,21 +135,16 @@
         text-align: left;
         border-radius: 5px;
         padding: 10px;
-        cursor: pointer;
         transition: background-color 0.2s;
-        border: rgba(0, 0, 0, 0.1) solid 1px;
-        font-family: "Roboto Flex", sans-serif;
-        width: calc(100% - 20px);
+        background-color: var(--color-bg-secondary);
+        color: var(--color-fg-secondary);
+        border: var(--color-border) solid 1px;
+        font-family: var(--font-secondary);
         box-sizing: border-box;
-    }
-
-    .itemgrid.mobile .option {
-        box-sizing: border-box;
-        width: calc(90vw - 20px);
     }
 
     .option:focus {
-        outline: 2px solid #000;
+        outline: 2px solid var(--color-accent-secondary);
     }
 
     .option span {
@@ -159,17 +153,19 @@
     }
 
     input[type="checkbox"] {
+        cursor: pointer;
         appearance: none;
         width: 20px;
         height: 20px;
         border-radius: 5px;
-        border: 1px solid rgba(0, 0, 0, 0.1);
+        border: 1px solid var(--color-border);
+        background-color: var(--color-bg-tertiary);
         transition: background-color 0.2s;
         cursor: pointer;
     }
 
     input[type="checkbox"]:checked {
-        background-color: #000;
+        background-color: var(--color-fg);
     }
 
     input[type="checkbox"]:focus {

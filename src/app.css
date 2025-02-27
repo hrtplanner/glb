@@ -1,7 +1,57 @@
-html, body {
+:root {
+    --font-primary: "DM Serif Text", serif;
+    --font-secondary: "Roboto Flex", sans-serif;
+    --color-bg-main: #f8f9fa;
+    --color-bg-secondary: #e9ecef;
+    --color-bg-tertiary: #dee2e6;
+    --color-fg: #000;
+    --color-fg-secondary: #6c757d;
+    --color-border: rgba(0, 0, 0, 0.1);
+    --color-accent: #9fe1fc;
+    --color-accent-secondary: #f7cad3;
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.08);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 2rem;
+    --spacing-xl: 3rem;
+    --transition-standard: all 0.2s ease-in-out;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --color-bg-main: #121212;
+        --color-bg-secondary: #1e1e1e;
+        --color-bg-tertiary: #333;
+        --color-border: rgba(255, 255, 255, 0.1);
+        --color-fg: #fff;
+        --color-fg-secondary: #adb5bd;
+        --color-accent: #9fe1fc;
+        --color-accent-secondary: #f7cad3;
+    }
+}
+
+@media (max-width: 768px) {
+    :root {
+        --spacing-lg: 1.5rem;
+        --spacing-xl: 2rem;
+    }
+
+    html, body, #app {
+        overflow-x: hidden;
+        font-size: 16px;
+    }
+}
+
+html, body, #app, main {
     margin: 0;
     padding: 0;
     height: 100%;
     width: 100%;
-    background: #fff;
+    background: var(--color-bg-secondary);
+    overflow: hidden;
+    scroll-behavior: smooth;
 }

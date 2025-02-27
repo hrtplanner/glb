@@ -20,7 +20,7 @@
     });
 </script>
 
-<div role="grid">
+<div role="grid" class="itemgrid">
     {#each optionsCopy as x, i (x[0])}
         <div
             tabindex={i}
@@ -55,47 +55,48 @@
 </div>
 
 <style>
+    .itemgrid {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
     .option {
         display: flex;
         flex-direction: row;
         align-items: center;
         justify-content: space-between;
-        margin: 10px;
+        flex-wrap: nowrap;
+        margin: 10px 0;
         text-align: left;
         border-radius: 5px;
         padding: 10px;
-        cursor: pointer;
         transition: background-color 0.2s;
-        border: rgba(0, 0, 0, 0.1) solid 1px;
-        font-family: "Roboto Flex", sans-serif;
-    }
-
-    .option.mobile {
-        flex-direction: column;
-        align-items: flex-start;
-        margin: 10px;
-        box-sizing: border-box;
-        width: calc(90vw - 20px);
+        border: var(--color-border) 1px solid;
+        background-color: var(--color-bg-secondary);
+        font-family: var(--font-secondary);
+        color: var(--color-fg-secondary);
+        width: calc(100% - 22px);
     }
 
     .option:focus {
-        outline: 2px solid #000;
+        outline: 2px solid var(--color-accent-secondary);
     }
 
     .option span {
         flex: 1;
         font-size: 0.9em;
-    }
-
-    .option.mobile span {
-        margin-bottom: 0.5rem;
+        max-width: 70%;
     }
 
     input[type="checkbox"] {
+        cursor: pointer;
         appearance: none;
         width: 20px;
         height: 20px;
-        border: 1px solid rgba(0, 0, 0, 0.1);
+        border: 1px solid var(--color-border);
+        background-color: var(--color-bg-tertiary);
         transition: background-color 0.2s;
         border-radius: 50%;
         cursor: pointer;
@@ -106,7 +107,7 @@
     }
 
     input[type="checkbox"]:checked {
-        background-color: #000;
+        background-color: var(--color-fg);
     }
 
     input[type="checkbox"]:focus {

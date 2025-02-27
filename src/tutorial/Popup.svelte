@@ -68,21 +68,22 @@
         width: 100%;
         max-width: 400px;
         display: block;
-        margin: 0 auto;
+        margin: 30px !important;
+        border: 2px solid var(--color-accent-secondary);
     }
 
     h1, h2, h3, i {
         text-align: center;
-        font-family: "DM Serif Text", serif;
+        font-family: var(--font-primary);
     }
 
     p {
         text-align: center;
-        font-family: "Roboto Flex", sans-serif;
+        font-family: var(--font-secondary);
     }
 
     a {
-        color: #797979;
+        color: var(--color-accent);
     }
 
     div *:not(div h1) {

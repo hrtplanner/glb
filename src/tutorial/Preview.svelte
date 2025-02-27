@@ -13,10 +13,10 @@
 
 <style>
     button {
-        background-color: #dddddd;
-        border: 1px solid rgba(0, 0, 0, 0.1);
+        background-color: var(--color-bg-secondary);
+        border: 1px solid var(--color-accent);
         box-sizing: border-box;
-        color: black;
+        color: var(--color-fg-secondary);
         padding: 10px 10px;
         border-radius: 2px;
         text-align: center;
