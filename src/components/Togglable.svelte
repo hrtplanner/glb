@@ -25,7 +25,7 @@
         <div
             tabindex={i}
             role="cell"
-            class="option {isMobile ? 'mobile' : ''}"
+            class="option {isMobile ? 'mobile' : ''} {oneOnly ? '' : 'multiselect'}"
             style="user-select: none;"
             data-index={i}
         >
@@ -36,6 +36,11 @@
                 (value) => {
                     if (oneOnly && value) {
                         const newOptions = optionsCopy.slice();
+                        for (let j = 0; j < newOptions.length; j++) {
+                            if (j !== i) {
+                                newOptions[j] = [newOptions[j][0], newOptions[j][1], false];
+                            }
+                        }
                         newOptions[i] = [x[0], x[1], value];
                         options.set(newOptions);
                         return;
@@ -90,10 +95,14 @@
         appearance: none;
         width: 20px;
         height: 20px;
-        border-radius: 50%;
         border: 1px solid rgba(0, 0, 0, 0.1);
         transition: background-color 0.2s;
+        border-radius: 50%;
         cursor: pointer;
+    }
+
+    .option.multiselect input[type="checkbox"] {
+        border-radius: 5px;
     }
 
     input[type="checkbox"]:checked {

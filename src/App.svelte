@@ -15,6 +15,7 @@
         nonBinary: Unused,
         agender: Unused,
         usesOtherPronouns: false,
+        usesAnyPronouns: false,
     });
 
     const languagePronouns = [
@@ -57,16 +58,21 @@
         };
     });
 
-    const languageOther = ["I use any (or a subset) of other pronouns."];
+    const languageOther = [
+        "I use any other pronouns.",
+        "I use another specific set of pronouns, such as neopronouns.",
+    ];
 
     const otherPronouns: Writable<[number, string, boolean][]> = writable([
         [0, languageOther[0], false],
+        [1, languageOther[1], false],
     ]);
 
     otherPronouns.subscribe((value) => {
         layerCake = {
             ...layerCake,
             usesOtherPronouns: value.find((x) => x[0] === 0)![2],
+            usesAnyPronouns: value.find((x) => x[0] === 1)![2],
         };
     });
 
@@ -109,10 +115,10 @@
     let genPronouns: [string, string][] = $state([]);
 
     const languagePresentation = [
-        "I usually present in a way that is typically masculine.",
-        "I usually present in a way that is typically feminine.",
-        "I usually present in a way that is typically androgynous.",
-        "I usually present in a way that is typically gender-neutral.",
+        "I may present in a way that is identifiably masculine.",
+        "I may present in a way that is identifiably feminine.",
+        "I may appear androgynous, where I present as a mix of both masculine/feminine properties.",
+        "I may appear gender-neutral, where I present in a fashion that is unrelated to the gender binary or is unidentifiable.",
     ];
 
     const presentation: Writable<[number, string, boolean][]> = writable([
@@ -146,12 +152,31 @@
 
     let isMobile = window.innerWidth < 800;
 
+    function verifySettingsIntegrity(settings: string): boolean {
+        try {
+            if (settings.length !== 4) {
+                return false;
+            }
+
+            const decoded = atob(settings);
+
+            if (decoded.length !== 3) {
+                return false;
+            }
+
+            return true;
+        } catch (e) {
+            return false;
+        }
+    }
+
     function encodeSettings() {
         let packed = 0;
         let bitPos = 0;
 
         for (const key in layerCake) {
-            if (key === "usesOtherPronouns") continue;
+            if (key === "usesOtherPronouns" || key === "usesAnyPronouns")
+                continue;
             const layer = layerCake[key] as Layer;
 
             if (layer.usesPronoun) packed |= 1 << bitPos;
@@ -168,6 +193,8 @@
         }
 
         if (layerCake.usesOtherPronouns) packed |= 1 << bitPos;
+        bitPos++;
+        if (layerCake.usesAnyPronouns) packed |= 1 << bitPos;
 
         return btoa(
             String.fromCharCode(
@@ -176,15 +203,6 @@
                 (packed >> 16) & 0xff,
             ),
         );
-    }
-
-    function verifySettingsIntegrity(str: string) {
-        try {
-            const decoded = atob(str);
-            return decoded.length === 3;
-        } catch (e) {
-            return false;
-        }
     }
 
     function decodeSettings(str: string) {
@@ -199,7 +217,8 @@
             let bitPos = 0;
 
             for (const key in layerCake) {
-                if (key === "usesOtherPronouns") continue;
+                if (key === "usesOtherPronouns" || key === "usesAnyPronouns")
+                    continue;
                 const layer = layerCake[key] as Layer;
 
                 layer.usesPronoun = !!(packed & (1 << bitPos));
@@ -217,6 +236,8 @@
                 layerCake[key] = layer;
             }
             layerCake.usesOtherPronouns = !!(packed & (1 << bitPos));
+            bitPos++;
+            layerCake.usesAnyPronouns = !!(packed & (1 << bitPos));
             updateStores();
         } catch (e) {
             window.location.hash = "";
@@ -265,6 +286,7 @@
 
         otherPronouns.update((value) => {
             value[0][2] = layerCake.usesOtherPronouns || false;
+            value[1][2] = layerCake.usesAnyPronouns || false;
             return value;
         });
     }
@@ -297,6 +319,7 @@
                         nonBinary: Unused,
                         agender: Unused,
                         usesOtherPronouns: false,
+                        usesAnyPronouns: false,
                     }}
                     bind:pronouns={genPronouns}
                     isMobile
@@ -333,69 +356,12 @@
 
                 <div class="question_section mobile">
                     <h3>Do you use any other pronouns?</h3>
-                    <Togglable options={otherPronouns} isMobile />
+                    <Togglable options={otherPronouns} />
                 </div>
 
                 <div class="question_section mobile">
                     <h3>How do you present (appear)?</h3>
-                    <Togglable options={presentation} oneOnly isMobile />
-                </div>
-            </div>
-        </div>
-    </main>
-
-    <main class="mobile">
-        <div class="canvas_wrapper mobile">
-            <Canvas>
-                <Scene
-                    layerCake={layerCake || {
-                        male: Unused,
-                        female: Unused,
-                        nonBinary: Unused,
-                        agender: Unused,
-                        usesOtherPronouns: false,
-                    }}
-                    bind:pronouns={genPronouns}
-                    isMobile
-                />
-            </Canvas>
-        </div>
-
-        <div class="mobile_questionnaire">
-            <div class="overflow">
-                <h1>Gender Lego Bricks</h1>
-
-                <h3>~ <i>Stereotypical pronouns</i></h3>
-                <div class="pronouns_display mobile">
-                    {#each genPronouns as [pronoun, color], i}
-                        <span style="color: {color}">{pronoun}</span>
-                        {#if i !== genPronouns.length - 1}
-                            <span class="separator">/</span>
-                        {/if}
-                    {/each}
-                </div>
-
-                <div class="question_section mobile">
-                    <h3>
-                        Which of the following do you identify with
-                        most-to-least?
-                    </h3>
-                    <TogglableDrag options={pronouns} isMobile />
-                </div>
-
-                <div class="question_section mobile">
-                    <h3>Do you identify with any of the following?</h3>
-                    <Togglable options={bigender} isMobile />
-                </div>
-
-                <div class="question_section mobile">
-                    <h3>Do you use any other pronouns?</h3>
-                    <Togglable options={otherPronouns} isMobile />
-                </div>
-
-                <div class="question_section mobile">
-                    <h3>How do you present (appear)?</h3>
-                    <Togglable options={presentation} oneOnly isMobile />
+                    <Togglable options={presentation} isMobile />
                 </div>
             </div>
         </div>
@@ -511,6 +477,7 @@
                         nonBinary: Unused,
                         agender: Unused,
                         usesOtherPronouns: false,
+                        usesAnyPronouns: false,
                     }}
                     bind:pronouns={genPronouns}
                     isMobile={false}
@@ -519,7 +486,10 @@
         </div>
 
         <div class="questionnaire_wrapper">
-            <h1>Gender Lego Bricks</h1>
+            <h1>
+                <div class="hrtplanner_square" title="hrtplanner"></div>
+                 Gender Lego Bricks
+            </h1>
             <div class="overflow">
                 <h3>~ <i>Stereotypical pronouns</i></h3>
                 <div class="pronouns_display">
@@ -557,9 +527,11 @@
                 </div>
 
                 <div class="question_section">
-                    <h3>How do you present (appear)?</h3>
+                    <h3>
+                        What are the different ways you may present (appear)?
+                    </h3>
                     <div class="scrollable">
-                        <Togglable options={presentation} oneOnly />
+                        <Togglable options={presentation} />
                     </div>
                 </div>
             </div>
@@ -567,10 +539,11 @@
     </main>
 
     <style scoped>
-        h1, h3 {
-            font-family: 'DM Serif Text', serif;
+        h1,
+        h3 {
+            font-family: "DM Serif Text", serif;
         }
-        
+
         main {
             min-height: 100vh;
             width: 100vw;
@@ -578,7 +551,20 @@
             align-items: center;
             flex-direction: row;
         }
-    
+
+        .hrtplanner_square {
+            display: inline-flex;
+            background: linear-gradient(to bottom, #9fe1fc, #f7cad3);
+            border-radius: 5px;
+            border: rgba(255, 255, 255, 0.1);
+            width: 30px;
+            height: 30px;
+            margin-right: 5px;
+            vertical-align: middle;
+            align-self: center;
+            transform: translateY(-10%);
+        }
+
         .canvas_wrapper {
             width: 800px;
             height: 500px;
@@ -587,7 +573,7 @@
             top: 50%;
             right: 0;
         }
-    
+
         .questionnaire_wrapper {
             width: 50vw;
             height: 100vh;
@@ -615,22 +601,22 @@
         }
 
         .pronouns_display {
-            font-family: 'DM Serif Text', serif;
-			display: flex;
-			margin-bottom: 50px;
-			padding: 3px;
-			border: 1px solid rgba(0,0,0,0.1);pronouns_disp
-			border-radius: 5px;
-			background-color: #c0c0c0;
-			padding-left: 10px;
-			box-sizing: border-box;
-			text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+            font-family: "DM Serif Text", serif;
+            display: flex;
+            margin-bottom: 50px;
+            padding: 3px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+            background-color: #c0c0c0;
+            padding-left: 10px;
+            box-sizing: border-box;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
         }
 
         .separator {
             color: #000;
             font-weight: bolder;
-            font-family: 'Roboto Flex', sans-serif;
+            font-family: "Roboto Flex", sans-serif;
         }
 
         .question_section {

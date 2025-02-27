@@ -25,24 +25,9 @@
             agender: "#61FF81",
         },
         bigenderOption: "#FF61FF",
-        otherPronouns: "#AFEEEE",
+        otherPronouns: "#FF69B4",
+        anyPronouns: "#87CEEB"
     };
-
-    function colorAverage(hexes: string[]) {
-        let averageRgb = [0, 0, 0];
-
-        for (const hex of hexes) {
-            const value = parseInt(hex.slice(1), 16);
-            averageRgb[0] += value >> 16;
-            averageRgb[1] += (value >> 8) & 0xff;
-            averageRgb[2] += value & 0xff;
-        }
-
-        averageRgb = averageRgb.map((value) =>
-            Math.round(value / hexes.length),
-        );
-        return `#${((averageRgb[0] << 16) | (averageRgb[1] << 8) | averageRgb[2]).toString(16).padStart(6, "0")}`;
-    }
 
     function isUsed(layer: Layer) {
         return layer.usesPronoun || layer.presentation;
@@ -55,6 +40,7 @@
             nonBinary: Unused,
             agender: Unused,
             usesOtherPronouns: false,
+            usesAnyPronouns: false
         },
         pronouns = $bindable([]),
         isMobile = false,
@@ -69,6 +55,7 @@
             .filter(
                 (key) =>
                     key !== "usesOtherPronouns" &&
+                    key !== "usesAnyPronouns" &&
                     (layerCake[key] as Layer).usesPronoun,
             )
             .sort((a, b) => {
@@ -81,6 +68,7 @@
         let bigenderGenders = Object.keys(layerCake).filter(
             (key) =>
                 key !== "usesOtherPronouns" &&
+                key !== "usesAnyPronouns" &&
                 (layerCake[key] as Layer).bigenderOption,
         );
 
@@ -165,8 +153,10 @@
             value = value.concat(outputPronouns.slice(0, 3));
         }
 
-        if (layerCake.usesOtherPronouns) {
-            value.push(["etc.", "#000000"]);
+        if (layerCake.usesAnyPronouns) {
+            value.push(["other", colors.anyPronouns as string]);
+        } else if (layerCake.usesOtherPronouns) {
+            value.push(["etc.", colors.otherPronouns as string]);
         }
 
         return value;
@@ -207,13 +197,22 @@
     {#if layerCake}
         <T.Mesh position={[0, 0, 0]}>
             <T.Mesh
-                position={[1.5, 1.5, -2]}
-                visible={layerCake.usesOtherPronouns!}
+                position={[1.5, 2.5, -2]}
+                visible={layerCake.usesAnyPronouns!}
+                castShadow
             >
-                <T.BoxGeometry args={[4, 4, 1]} />
+                <T.BoxGeometry args={[4, 2, 1]} />
+                <T.MeshBasicMaterial color={colors.anyPronouns as string} />
+            </T.Mesh>
+            <T.Mesh
+                position={[1.5, 0.5, -2]}
+                visible={layerCake.usesOtherPronouns!}
+                castShadow
+            >
+                <T.BoxGeometry args={[4, 2, 1]} />
                 <T.MeshBasicMaterial color={colors.otherPronouns as string} />
             </T.Mesh>
-            {#each Object.keys(layerCake).slice(0, -1) as layer, i}
+            {#each Object.keys(layerCake).slice(0, -2) as layer, i}
                 <T.Mesh position={[i, 0, 0]}>
                     <T.Mesh
                         position={[0, 0, 0]}
@@ -224,6 +223,7 @@
                                         .presentation ||
                                     (layerCake["agender"] as Layer)
                                         .bigenderOption))}
+                        castShadow
                     >
                         <T.BoxGeometry args={[1, 1, 3]} />
                         <T.MeshBasicMaterial
@@ -243,6 +243,7 @@
                                         5,
                                     ),
                             ]}
+                            castShadow
                         >
                             <T.BoxGeometry width={1} height={1} depth={1} />
                             <T.MeshBasicMaterial
@@ -259,6 +260,7 @@
                     <T.Mesh
                         position={[0, 2, 0]}
                         visible={(layerCake[layer] as Layer).presentation}
+                        castShadow
                     >
                         <T.BoxGeometry args={[1, 1, 3]} />
                         <T.MeshBasicMaterial
@@ -268,6 +270,7 @@
                     <T.Mesh
                         position={[0, 3, 0]}
                         visible={(layerCake[layer] as Layer).bigenderOption}
+                        castShadow
                     >
                         <T.BoxGeometry args={[1, 1, 3]} />
                         <T.MeshBasicMaterial

@@ -11,6 +11,7 @@ export interface LayerCake {
     nonBinary: Layer;
     agender: Layer;
     usesOtherPronouns?: boolean;
+    usesAnyPronouns?: boolean;
 }
 
 export const Unused: Layer = {

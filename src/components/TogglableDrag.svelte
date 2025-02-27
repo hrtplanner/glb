@@ -162,7 +162,7 @@
         appearance: none;
         width: 20px;
         height: 20px;
-        border-radius: 50%;
+        border-radius: 5px;
         border: 1px solid rgba(0, 0, 0, 0.1);
         transition: background-color 0.2s;
         cursor: pointer;
