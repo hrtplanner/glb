@@ -6,6 +6,8 @@
     import { writable, type Writable } from "svelte/store";
     import { onMount } from "svelte";
     import Togglable from "./components/Togglable.svelte";
+    import Modal from "svelte-simple-modal";
+    import Preview from "./tutorial/Preview.svelte";
 
     type LC = LayerCake & { [key: string]: Layer | boolean };
 
@@ -150,7 +152,11 @@
         };
     });
 
-    let isMobile = window.innerWidth < 800;
+    let isMobile = $state(window.innerWidth < 800);
+
+    window.addEventListener("resize", () => {
+        isMobile = window.innerWidth < 800;
+    });
 
     function verifySettingsIntegrity(settings: string): boolean {
         try {
@@ -331,10 +337,12 @@
             <div class="overflow">
                 <h1>Gender Lego Bricks</h1>
 
+                <Modal><Preview /></Modal>
+
                 <h3>~ <i>Stereotypical pronouns</i></h3>
                 <div class="pronouns_display mobile">
                     {#each genPronouns as [pronoun, color], i}
-                        <span style="color: {color}">{pronoun}</span>
+                        <span style="color: {color}; -webkit-text-stroke: 0.5px black;">{pronoun}</span>
                         {#if i !== genPronouns.length - 1}
                             <span class="separator">/</span>
                         {/if}
@@ -490,11 +498,12 @@
                 <div class="hrtplanner_square" title="hrtplanner"></div>
                  Gender Lego Bricks
             </h1>
+            <Modal><Preview /></Modal>
             <div class="overflow">
                 <h3>~ <i>Stereotypical pronouns</i></h3>
                 <div class="pronouns_display">
                     {#each genPronouns as [pronoun, color], i}
-                        <span style="color: {color}">{pronoun}</span>
+                        <span style="color: {color}; -webkit-text-stroke: 0.5px black;">{pronoun}</span>
                         {#if i !== genPronouns.length - 1}
                             <span class="separator">/</span>
                         {/if}
