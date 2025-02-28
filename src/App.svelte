@@ -82,7 +82,7 @@
         "On different occasions, I feel more-or-less masculine.",
         "On different occasions, I feel more-or-less feminine.",
         "On different occasions, I feel more-or-less a gender outside of the male/female binary.",
-        "On different occasions, I feel more-or-less a gender unrelated to the male/female binary.",
+        "On different occasions, I feel I have no gender at all; I may not identify as male, female or a specific non-binary identity.",
     ];
 
     const bigender: Writable<[number, string, boolean][]> = writable([
