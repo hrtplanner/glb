@@ -7,6 +7,7 @@
     import { onMount } from "svelte";
     import Togglable from "./components/Togglable.svelte";
     import Modal from "./tutorial/Modal.svelte";
+    import Preview from "./tutorial/Preview.svelte";
 
     type LC = LayerCake & { [key: string]: Layer | boolean };
 
@@ -313,327 +314,326 @@
     });
 </script>
 
-{#if isMobile}
-    <main class="mobile">
-        <div class="canvas_wrapper mobile">
-            <Canvas>
-                <Scene
-                    layerCake={layerCake || {
-                        male: Unused,
-                        female: Unused,
-                        nonBinary: Unused,
-                        agender: Unused,
-                        usesOtherPronouns: false,
-                        usesAnyPronouns: false,
-                    }}
-                    bind:pronouns={genPronouns}
-                    isMobile
-                />
-            </Canvas>
-        </div>
-
-        <div class="mobile_questionnaire">
-            <div class="overflow">
-                <h1>Gender Lego Bricks</h1>
-
-                <Modal />
-
-                <h3>~ <i>Stereotypical pronouns</i></h3>
-                <div class="pronouns_display mobile">
-                    {#each genPronouns as [pronoun, color], i}
-                        <span
-                            style="color: {color};"
-                            >{pronoun}</span
-                        >
-                        {#if i !== genPronouns.length - 1}
-                            <span class="separator">/</span>
-                        {/if}
-                    {/each}
-                </div>
-
-                <div class="question_section mobile">
-                    <h3>
-                        Which of the following do you identify with
-                        most-to-least?
-                    </h3>
-                    <TogglableDrag options={pronouns} isMobile />
-                </div>
-
-                <div class="question_section mobile">
-                    <h3>Do you identify with any of the following?</h3>
-                    <Togglable options={bigender} isMobile />
-                </div>
-
-                <div class="question_section mobile">
-                    <h3>Do you use any other pronouns?</h3>
-                    <Togglable options={otherPronouns} />
-                </div>
-
-                <div class="question_section mobile">
-                    <h3>How do you present (appear)?</h3>
-                    <Togglable options={presentation} isMobile />
-                </div>
+<Modal>
+    {#if isMobile}
+        <main class="mobile">
+            <div class="canvas_wrapper mobile">
+                <Canvas>
+                    <Scene
+                        layerCake={layerCake || {
+                            male: Unused,
+                            female: Unused,
+                            nonBinary: Unused,
+                            agender: Unused,
+                            usesOtherPronouns: false,
+                            usesAnyPronouns: false,
+                        }}
+                        bind:pronouns={genPronouns}
+                        isMobile
+                    />
+                </Canvas>
             </div>
-        </div>
-    </main>
 
-    <style global>
-        .canvas_wrapper.mobile, .canvas_wrapper.mobile div {
-            max-width: 360px;
-            transform: translateY(15%) translateX(-7%);
-        }
-    </style>
-{:else}
-    <main>
-        <div class="canvas_wrapper">
-            <Canvas>
-                <Scene
-                    layerCake={layerCake || {
-                        male: Unused,
-                        female: Unused,
-                        nonBinary: Unused,
-                        agender: Unused,
-                        usesOtherPronouns: false,
-                        usesAnyPronouns: false,
-                    }}
-                    bind:pronouns={genPronouns}
-                    isMobile={false}
-                />
-            </Canvas>
-        </div>
+            <div class="mobile_questionnaire">
+                <div class="overflow">
+                    <h1>Gender Lego Bricks</h1>
 
-        <div class="questionnaire_wrapper">
-            <h1>
-                <div class="hrtplanner_square" title="hrtplanner"></div>
-                Gender Lego Bricks
-            </h1>
+                    <Preview />
 
-            <Modal />
-
-            <div class="overflow">
-                <h3>~ <i>Stereotypical pronouns</i></h3>
-                <div class="pronouns_display">
-                    {#each genPronouns as [pronoun, color], i}
-                        <span
-                            style="color: {color};"
-                            >{pronoun}</span
-                        >
-                        {#if i !== genPronouns.length - 1}
-                            <span class="separator">/</span>
-                        {/if}
-                    {/each}
-                </div>
-
-                <div class="question_section">
-                    <h3>
-                        Which of the following do you identify with
-                        most-to-least?
-                    </h3>
-                    <div class="scrollable">
-                        <TogglableDrag options={pronouns} />
+                    <h3>~ <i>Stereotypical pronouns</i></h3>
+                    <div class="pronouns_display mobile">
+                        {#each genPronouns as [pronoun, color], i}
+                            <span style="color: {color};">{pronoun}</span>
+                            {#if i !== genPronouns.length - 1}
+                                <span class="separator">/</span>
+                            {/if}
+                        {/each}
                     </div>
-                </div>
 
-                <div class="question_section">
-                    <h3>Do you identify with any of the following?</h3>
-
-                    <div class="scrollable">
-                        <Togglable options={bigender} />
+                    <div class="question_section mobile">
+                        <h3>
+                            Which of the following do you identify with
+                            most-to-least?
+                        </h3>
+                        <TogglableDrag options={pronouns} isMobile />
                     </div>
-                </div>
 
-                <div class="question_section">
-                    <h3>Do you use any other pronouns?</h3>
-                    <div class="scrollable">
+                    <div class="question_section mobile">
+                        <h3>Do you identify with any of the following?</h3>
+                        <Togglable options={bigender} isMobile />
+                    </div>
+
+                    <div class="question_section mobile">
+                        <h3>Do you use any other pronouns?</h3>
                         <Togglable options={otherPronouns} />
                     </div>
-                </div>
 
-                <div class="question_section">
-                    <h3>
-                        What are the different ways you may present (appear)?
-                    </h3>
-                    <div class="scrollable">
-                        <Togglable options={presentation} />
+                    <div class="question_section mobile">
+                        <h3>How do you present (appear)?</h3>
+                        <Togglable options={presentation} isMobile />
                     </div>
                 </div>
             </div>
-        </div>
-    </main>
-{/if}
+        </main>
 
-<style>
-    h1,
-    h3 {
-        font-family: var(--font-primary);
-        margin-bottom: var(--spacing-md);
-        color: var(--color-fg);
-    }
+        <style global>
+            .canvas_wrapper.mobile,
+            .canvas_wrapper.mobile div {
+                max-width: 360px;
+                transform: translateY(15%) translateX(-7%);
+            }
+        </style>
+    {:else}
+        <main>
+            <div class="canvas_wrapper">
+                <Canvas>
+                    <Scene
+                        layerCake={layerCake || {
+                            male: Unused,
+                            female: Unused,
+                            nonBinary: Unused,
+                            agender: Unused,
+                            usesOtherPronouns: false,
+                            usesAnyPronouns: false,
+                        }}
+                        bind:pronouns={genPronouns}
+                        isMobile={false}
+                    />
+                </Canvas>
+            </div>
 
-    main {
-        min-height: 100vh;
-        width: 100vw;
-        display: flex;
-        align-items: center;
-    }
+            <div class="questionnaire_wrapper">
+                <h1>
+                    <div class="hrtplanner_square" title="hrtplanner"></div>
+                    Gender Lego Bricks
+                </h1>
 
-    main.mobile {
-        flex-direction: column;
-    }
+                <Preview />
 
-    .canvas_wrapper {
-        position: fixed;
-        pointer-events: none;
-    }
+                <div class="overflow">
+                    <h3>~ <i>Stereotypical pronouns</i></h3>
+                    <div class="pronouns_display">
+                        {#each genPronouns as [pronoun, color], i}
+                            <span style="color: {color};">{pronoun}</span>
+                            {#if i !== genPronouns.length - 1}
+                                <span class="separator">/</span>
+                            {/if}
+                        {/each}
+                    </div>
 
-    .canvas_wrapper.mobile {
-        max-width: 360px;
-        max-height: 360px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        top: 0;
-        left: 0;
-    }
+                    <div class="question_section">
+                        <h3>
+                            Which of the following do you identify with
+                            most-to-least?
+                        </h3>
+                        <div class="scrollable">
+                            <TogglableDrag options={pronouns} />
+                        </div>
+                    </div>
 
-    .canvas_wrapper:not(.mobile) {
-        width: 800px;
-        height: 500px;
-        transform: translateY(-50%);
-        top: 50%;
-        right: 0;
-    }
+                    <div class="question_section">
+                        <h3>Do you identify with any of the following?</h3>
 
-    .canvas_wrapper.mobile {
-        position: absolute;
-        left: 50%;
-        transform: translateX(-40%);
-    }
+                        <div class="scrollable">
+                            <Togglable options={bigender} />
+                        </div>
+                    </div>
 
-    .questionnaire_wrapper,
-    .mobile_questionnaire {
-        background-color: var(--color-bg-main);
-        padding: var(--spacing-lg);
-        box-sizing: border-box;
-        position: fixed;
-        box-shadow: var(--shadow-md);
-        transition: var(--transition-standard);
-        overflow-x: hidden;
-    }
+                    <div class="question_section">
+                        <h3>Do you use any other pronouns?</h3>
+                        <div class="scrollable">
+                            <Togglable options={otherPronouns} />
+                        </div>
+                    </div>
 
-    .questionnaire_wrapper {
-        width: 50vw;
-        height: 100vh;
-        top: 0;
-        left: 0;
-        display: flex;
-        flex-direction: column;
-        border-right: 1px solid var(--color-border);
-    }
+                    <div class="question_section">
+                        <h3>
+                            What are the different ways you may present
+                            (appear)?
+                        </h3>
+                        <div class="scrollable">
+                            <Togglable options={presentation} />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    {/if}
 
-    .mobile_questionnaire {
-        width: 100vw;
-        top: 300px;
-        left: 0;
-        height: calc(100vh - 200px);
-        padding-bottom: calc(var(--spacing-lg) + var(--spacing-xl));
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        border-top-left-radius: var(--radius-md);
-        border-top-right-radius: var(--radius-md);
-    }
+    <style>
+        h1,
+        h3 {
+            font-family: var(--font-primary);
+            margin-bottom: var(--spacing-md);
+            color: var(--color-fg);
+        }
 
-    .overflow {
-        overflow-x: hidden;
-        overflow-y: auto;
-        width: 100%;
-        scrollbar-width: none;
-        -ms-overflow-style: none;
-        border-radius: var(--radius-sm);
-    }
+        main {
+            min-height: 100vh;
+            width: 100vw;
+            display: flex;
+            align-items: center;
+        }
 
-    .questionnaire_wrapper .overflow {
-        height: calc(100% - 100px);
-    }
+        main.mobile {
+            flex-direction: column;
+        }
 
-    .mobile_questionnaire .overflow {
-        max-height: 100%;
-    }
+        .canvas_wrapper {
+            position: fixed;
+            pointer-events: none;
+        }
 
-    .overflow::-webkit-scrollbar,
-    .scrollable::-webkit-scrollbar {
-        display: none;
-    }
+        .canvas_wrapper.mobile {
+            max-width: 360px;
+            max-height: 360px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            top: 0;
+            left: 0;
+        }
 
-    .pronouns_display {
-        font-family: var(--font-primary);
-        margin-bottom: var(--spacing-xl);
-        padding: var(--spacing-sm) var(--spacing-md);
-        border: 1px solid var(--color-border);
-        border-radius: var(--radius-sm);
-        background-color: var(--color-bg-secondary);
-        box-sizing: border-box;
-        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.05);
-        transition: var(--transition-standard);
-    }
+        .canvas_wrapper:not(.mobile) {
+            width: 800px;
+            height: 500px;
+            transform: translateY(-50%);
+            top: 50%;
+            right: 0;
+        }
 
-    .pronouns_display:not(.mobile) {
-        display: flex;
-    }
+        .canvas_wrapper.mobile {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-40%);
+        }
 
-    .pronouns_display.mobile {
-        display: block;
-        width: 100%;
-    }
+        .questionnaire_wrapper,
+        .mobile_questionnaire {
+            background-color: var(--color-bg-main);
+            padding: var(--spacing-lg);
+            box-sizing: border-box;
+            position: fixed;
+            box-shadow: var(--shadow-md);
+            transition: var(--transition-standard);
+            overflow-x: hidden;
+        }
 
-    .pronouns_display span {
-        transition: var(--transition-standard);
-    }
+        .questionnaire_wrapper {
+            width: 50vw;
+            height: 100vh;
+            top: 0;
+            left: 0;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid var(--color-border);
+        }
 
-    .separator {
-        color: var(--color-fg);
-        font-weight: bold;
-        font-family: var(--font-secondary);
-        margin: 0 var(--spacing-xs);
-    }
+        .mobile_questionnaire {
+            width: calc(100vw - 10px);
+            bottom: 20px;
+            left: 0;
+            height: calc(100vh - 320px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border-radius: var(--radius-md);
+            border: 1.2px solid var(--color-border);
+            box-shadow: var(--shadow-md);
+            transform: translateX(5px);
+        }
 
-    .question_section {
-        width: 100%;
-        margin-bottom: var(--spacing-lg);
-        padding-bottom: var(--spacing-md);
-        border-bottom: 1px solid var(--color-border);
-    }
+        .overflow {
+            overflow-x: hidden;
+            overflow-y: auto;
+            width: 100%;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            border-radius: var(--radius-sm);
+        }
 
-    .scrollable {
-        overflow-x: hidden;
-        overflow-y: auto;
-        scrollbar-width: none;
-        -ms-overflow-style: none;
-        border-radius: var(--radius-sm);
-        padding: var(--spacing-xs);
-    }
+        .questionnaire_wrapper .overflow {
+            height: calc(100% - 100px);
+        }
 
-    .hrtplanner_square {
-        display: inline-flex;
-        background: linear-gradient(
-            to bottom,
-            var(--color-accent),
-            var(--color-accent-secondary)
-        );
-        border-radius: var(--radius-sm);
-        width: 30px;
-        height: 30px;
-        margin-right: var(--spacing-sm);
-        vertical-align: middle;
-        align-self: center;
-        transform: translateY(-10%);
-        box-shadow: var(--shadow-sm);
-        transition: var(--transition-standard);
-    }
+        .mobile_questionnaire .overflow {
+            max-height: 100%;
+        }
 
-    .hrtplanner_square:hover {
-        transform: translateY(-10%) scale(1.05);
-        box-shadow: var(--shadow-md);
-    }
-</style>
+        .overflow::-webkit-scrollbar,
+        .scrollable::-webkit-scrollbar {
+            display: none;
+        }
+
+        .pronouns_display {
+            font-family: var(--font-primary);
+            margin-bottom: var(--spacing-xl);
+            padding: var(--spacing-sm) var(--spacing-md);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-sm);
+            background-color: var(--color-bg-secondary);
+            box-sizing: border-box;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.05);
+            transition: var(--transition-standard);
+        }
+
+        .pronouns_display:not(.mobile) {
+            display: flex;
+        }
+
+        .pronouns_display.mobile {
+            display: block;
+            width: 100%;
+        }
+
+        .pronouns_display span {
+            transition: var(--transition-standard);
+        }
+
+        .separator {
+            color: var(--color-fg);
+            font-weight: bold;
+            font-family: var(--font-secondary);
+            margin: 0 var(--spacing-xs);
+        }
+
+        .question_section {
+            width: 100%;
+            margin-bottom: var(--spacing-lg);
+            padding-bottom: var(--spacing-md);
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .scrollable {
+            overflow-x: hidden;
+            overflow-y: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            border-radius: var(--radius-sm);
+            padding: var(--spacing-xs);
+        }
+
+        .hrtplanner_square {
+            display: inline-flex;
+            background: linear-gradient(
+                to bottom,
+                var(--color-accent),
+                var(--color-accent-secondary)
+            );
+            border-radius: var(--radius-sm);
+            width: 30px;
+            height: 30px;
+            margin-right: var(--spacing-sm);
+            vertical-align: middle;
+            align-self: center;
+            transform: translateY(-10%);
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition-standard);
+        }
+
+        .hrtplanner_square:hover {
+            transform: translateY(-10%) scale(1.05);
+            box-shadow: var(--shadow-md);
+        }
+    </style>
+</Modal>

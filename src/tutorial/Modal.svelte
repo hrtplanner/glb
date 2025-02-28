@@ -1,12 +1,13 @@
 <script lang="ts">
     import Modal from "svelte-simple-modal";
-    import Preview from "./Preview.svelte";
 
     let isMobile = $state(window.innerWidth < 768);
 
     window.addEventListener('resize', () => {
         isMobile = window.innerWidth < 768;
     });
+
+    let { children } = $props();
 </script>
 
 <Modal
@@ -15,7 +16,7 @@
         backgroundColor: 'var(--color-bg-secondary)',
         border: '1px solid var(--color-border)',
         color: 'var(--color-fg)',
-        maxHeight: '90vh',
+        maxHeight: 'calc(90vh - 20px)',
         maxWidth: '100vw',
         minWidth: isMobile ? '90vw' : '50vw',
         overflow: 'auto',
@@ -24,7 +25,7 @@
         position: 'absolute',
         top: '50%',
         left: '50%',
-        transform: 'translate(-50%, -50%)',
+        transform: 'translate(-50%, calc(-50% - 20px))',
     }}
     styleBg={{
         backgroundColor: 'rgba(0, 0, 0, 0.5)',
@@ -60,5 +61,5 @@
         cursor: 'pointer',
     }}
 >
-    <Preview />
+    {@render children?.()}
 </Modal>

@@ -72,7 +72,7 @@
         text-align: left;
         border-radius: 5px;
         padding: 10px;
-        transition: background-color 0.2s;
+        transition: var(--transition-standard);
         border: var(--color-border) 1px solid;
         background-color: var(--color-bg-secondary);
         font-family: var(--font-secondary);
@@ -97,7 +97,7 @@
         height: 20px;
         border: 1px solid var(--color-border);
         background-color: var(--color-bg-tertiary);
-        transition: background-color 0.2s;
+        transition: var(--transition-standard);
         border-radius: 50%;
         cursor: pointer;
     }

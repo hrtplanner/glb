@@ -135,7 +135,7 @@
         text-align: left;
         border-radius: 5px;
         padding: 10px;
-        transition: background-color 0.2s;
+        transition: var(--transition-standard);
         background-color: var(--color-bg-secondary);
         color: var(--color-fg-secondary);
         border: var(--color-border) solid 1px;
@@ -160,7 +160,7 @@
         border-radius: 5px;
         border: 1px solid var(--color-border);
         background-color: var(--color-bg-tertiary);
-        transition: background-color 0.2s;
+        transition: var(--transition-standard);
         cursor: pointer;
     }
 

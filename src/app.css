@@ -31,6 +31,8 @@
         --color-fg-secondary: #adb5bd;
         --color-accent: #9fe1fc;
         --color-accent-secondary: #f7cad3;
+        --shadow-sm: 0 2px 4px rgba(142, 142, 142, 0.08);
+        --shadow-md: 0 4px 6px rgba(149, 149, 149, 0.1);
     }
 }
 
